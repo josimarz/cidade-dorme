@@ -59,7 +59,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Conectar ao servidor WebSocket
-    const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
+    const serverUrl = import.meta.env.VITE_SERVER_URL || 
+      (import.meta.env.PROD ? 'https://citysleeps.netlify.app' : 'http://localhost:3000');
     socket = io(serverUrl);
 
     socket.on('connect', () => {
