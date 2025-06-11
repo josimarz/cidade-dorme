@@ -46,8 +46,10 @@ if (process.env.NODE_ENV === 'production') {
 
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor Cidade Dorme rodando na porta ${PORT}`);
-  console.log(`📱 WebSocket endpoint: ws://localhost:${PORT}`);
-  console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+  console.log(`📱 WebSocket endpoint: ws://0.0.0.0:${PORT}`);
+  console.log(`🏥 Health check: http://0.0.0.0:${PORT}/health`);
+  console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔗 Cliente permitido: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
 }); 
