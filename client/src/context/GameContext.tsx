@@ -8,6 +8,7 @@ interface GameContextType {
   joinRoom: (roomId: string, playerName: string) => Promise<WebSocketResponse>;
   setReady: (ready: boolean) => Promise<WebSocketResponse>;
   startGame: () => Promise<WebSocketResponse>;
+  restartGame: () => Promise<WebSocketResponse>;
   disconnect: () => void;
 }
 
@@ -86,6 +87,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
     });
 
     socket.on('game:started', ({ room, yourRole, isNarrator }: {
+      room: Room;
+      yourRole: string;
+      isNarrator: boolean;
+    }) => {
+      dispatch({ type: 'SET_ROOM', payload: room });
+      dispatch({ type: 'SET_PLAYER_DATA', payload: { 
+        playerId: state.playerId || '', 
+        yourRole, 
+        isNarrator 
+      } });
+    });
+
+    socket.on('game:restarted', ({ room, yourRole, isNarrator }: {
       room: Room;
       yourRole: string;
       isNarrator: boolean;
@@ -180,6 +194,22 @@ export function GameProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const restartGame = (): Promise<WebSocketResponse> => {
+    return new Promise((resolve) => {
+      if (!socket) {
+        resolve({ success: false, error: 'Conexão não estabelecida' });
+        return;
+      }
+
+      socket.emit('game:restart', {}, (response: WebSocketResponse) => {
+        if (!response.success) {
+          dispatch({ type: 'SET_ERROR', payload: response.error || 'Erro ao reiniciar jogo' });
+        }
+        resolve(response);
+      });
+    });
+  };
+
   const disconnect = () => {
     socket?.disconnect();
     dispatch({ type: 'CLEAR_GAME' });
@@ -192,6 +222,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       joinRoom,
       setReady,
       startGame,
+      restartGame,
       disconnect,
     }}>
       {children}

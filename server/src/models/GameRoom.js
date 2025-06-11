@@ -113,6 +113,47 @@ export class GameRoom {
   }
 
   /**
+   * Reinicia o jogo (somente o narrador pode fazer isso)
+   * @param {string} narratorId 
+   */
+  restartGame(narratorId) {
+    if (narratorId !== this.narratorId) {
+      throw new Error('Apenas o narrador pode reiniciar o jogo');
+    }
+
+    if (this.state !== GameRoom.STATES.IN_PROGRESS && this.state !== GameRoom.STATES.FINISHED) {
+      throw new Error('Não é possível reiniciar o jogo neste momento');
+    }
+
+    // Verificar se ainda há jogadores suficientes
+    if (this.players.size < 6) {
+      throw new Error('Número insuficiente de jogadores para reiniciar (mínimo 6)');
+    }
+
+    // Limpar papéis existentes (exceto narrador)
+    for (const [playerId, player] of this.players.entries()) {
+      if (!player.isNarrator) {
+        player.setRole(null);
+      }
+    }
+
+    // Redistribuir papéis
+    const playersList = Array.from(this.players.values());
+    const roleAssignments = RoleAssigner.assignRoles(playersList);
+    
+    // Aplicar novos papéis aos jogadores
+    for (const [playerId, role] of roleAssignments.entries()) {
+      const player = this.players.get(playerId);
+      if (player) {
+        player.setRole(role);
+      }
+    }
+
+    this.state = GameRoom.STATES.IN_PROGRESS;
+    this.startedAt = new Date();
+  }
+
+  /**
    * Atualiza o estado da sala baseado nos jogadores
    */
   updateRoomState() {

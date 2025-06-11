@@ -2,7 +2,7 @@ import { useGame } from '../context/GameContext';
 import { ROLES, RoleType } from '../types/game';
 
 export function GamePage() {
-  const { state, disconnect } = useGame();
+  const { state, disconnect, restartGame } = useGame();
 
   if (!state.room || !state.yourRole) {
     return null;
@@ -56,6 +56,18 @@ export function GamePage() {
 
   const handleNewGame = () => {
     disconnect();
+  };
+
+  const handleRestartGame = async () => {
+    try {
+      const result = await restartGame();
+      if (!result.success) {
+        console.error('Erro ao reiniciar partida:', result.error);
+        // Aqui você pode adicionar uma notificação de erro se desejar
+      }
+    } catch (error) {
+      console.error('Erro ao reiniciar partida:', error);
+    }
   };
 
   return (
@@ -157,13 +169,26 @@ export function GamePage() {
           </div>
         </div>
 
-        {/* Action Button */}
-        <button
-          onClick={handleNewGame}
-          className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200"
-        >
-          🏠 Voltar ao Início
-        </button>
+        {/* Action Buttons */}
+        <div className="space-y-3">
+          {/* Botão Reiniciar Partida - apenas para narrador */}
+          {isNarrator && (
+            <button
+              onClick={handleRestartGame}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200"
+            >
+              🔄 Reiniciar Partida
+            </button>
+          )}
+          
+          {/* Botão Voltar ao Início */}
+          <button
+            onClick={handleNewGame}
+            className="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200"
+          >
+            🏠 Voltar ao Início
+          </button>
+        </div>
 
         {/* Footer */}
         <div className="text-center text-white/70 text-sm">

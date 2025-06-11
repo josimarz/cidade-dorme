@@ -164,6 +164,58 @@ export function setupWebSocketHandlers(io) {
       }
     });
 
+    // Reiniciar o jogo (apenas narrador)
+    socket.on('game:restart', (_, callback) => {
+      try {
+        const room = roomManager.findRoomByPlayer(socket.id);
+        if (!room) {
+          throw new Error('Sala não encontrada');
+        }
+
+        const player = room.findPlayerBySocket(socket.id);
+        if (!player) {
+          throw new Error('Jogador não encontrado');
+        }
+
+        room.restartGame(player.id);
+
+        console.log(`Jogo reiniciado na sala ${room.id} por ${player.name}`);
+
+        // Notificar todos na sala que o jogo foi reiniciado
+        for (const [playerId, roomPlayer] of room.players.entries()) {
+          const socketId = roomPlayer.socketId;
+          
+          if (roomPlayer.isNarrator) {
+            // Narrador vê todos os papéis
+            io.to(socketId).emit('game:restarted', {
+              room: room.toNarratorView(),
+              yourRole: roomPlayer.role,
+              isNarrator: true
+            });
+          } else {
+            // Jogadores veem apenas seu próprio papel
+            io.to(socketId).emit('game:restarted', {
+              room: room.toPublic(),
+              yourRole: roomPlayer.role,
+              isNarrator: false
+            });
+          }
+        }
+
+        callback({
+          success: true,
+          room: room.toNarratorView()
+        });
+
+      } catch (error) {
+        console.error('Erro ao reiniciar jogo:', error.message);
+        callback({
+          success: false,
+          error: error.message
+        });
+      }
+    });
+
     // Obter estado atual da sala
     socket.on('room:get_state', (_, callback) => {
       try {
