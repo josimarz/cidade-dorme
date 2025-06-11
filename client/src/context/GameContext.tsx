@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { GameState, WebSocketResponse, Room, Player } from '../types/game';
+import { GameState, WebSocketResponse, Room } from '../types/game';
 
 interface GameContextType {
   state: GameState;

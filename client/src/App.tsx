@@ -1,4 +1,3 @@
-import React from 'react';
 import { GameProvider, useGame } from './context/GameContext';
 import { HomePage } from './components/HomePage';
 import { LobbyPage } from './components/LobbyPage';

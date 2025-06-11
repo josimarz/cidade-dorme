@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { Player } from '../types/game';
 
@@ -58,7 +58,7 @@ export function LobbyPage() {
   };
 
   const getRoomStateMessage = () => {
-    const { playerCount, minPlayers, maxPlayers } = state.room!;
+    const { playerCount, minPlayers } = state.room!;
     
     if (playerCount < minPlayers) {
       return `Aguardando mais ${minPlayers - playerCount} jogador(es) para começar`;
