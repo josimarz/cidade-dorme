@@ -1,0 +1,24 @@
+services:
+  # Servidor Node.js com WebSockets
+  - type: web
+    name: cidade-dorme-server
+    env: node
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: CLIENT_URL
+        value: https://citysleeps.onrender.com
+
+  # Cliente React (Static Site)
+  - type: web
+    name: cidade-dorme-client
+    env: static
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: client/dist
+    envVars:
+      - key: VITE_SERVER_URL
+        value: https://cidade-dorme-server.onrender.com 
